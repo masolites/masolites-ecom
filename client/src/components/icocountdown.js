@@ -1,25 +1,33 @@
-// ICO Dashboard with Token Progress
-export default function ICOCountdown() {
+ import { useState, useEffect } from 'react';
+
+const ICOCountdown = () => {
   const [daysLeft, setDaysLeft] = useState(120);
-  const [tokenPrice, setTokenPrice] = useState(0.001);
   
   useEffect(() => {
-    // Calculate token price progression
-    const progress = (120 - daysLeft) / 120;
-    const targetPrice = 0.4 + (0.35 * progress);
-    setTokenPrice(Math.min(targetPrice, 0.75));
-  }, [daysLeft]);
+    // Set the start date of the ICO (YYYY-MM-DD)
+    const icoStartDate = new Date('2023-10-01');
+    const updateCountdown = () => {
+      const today = new Date();
+      const diffTime = icoStartDate.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setDaysLeft(diffDays > 0 ? diffDays : 0);
+    };
+    
+    updateCountdown();
+    const timer = setInterval(updateCountdown, 86400000); // Daily update
+    
+    return () => clearInterval(timer);
+  }, []);
 
   return (
-    <div className="ico-dashboard">
-      <h3>PRIVATE SALE ICO</h3>
-      <CountdownTimer targetDate={new Date(launchDate + 120*86400000)} />
-      <TokenProgressBar current={tokenPrice} min={0.001} max={3} />
-      <div className="price-voting">
-        <h4>Vote for Tomorrow's Price: ${tokenPrice.toFixed(3)}</h4>
-        {user.balanceMZLx >= 100 && (
-          <VotingSlider min={0.4} max={3} step={0.01} />
-        )}
+    <div className="ico-countdown">
+      <h2>PRIVATE SALE ENDS IN</h2>
+      <div className="countdown-timer">{daysLeft} DAYS</div>
+      <div className="progress-bar">
+        <div style={{ width: `${(120-daysLeft)/120*100}%` }}></div>
       </div>
     </div>
   );
+};
+
+export default ICOCountdown;
